@@ -6,7 +6,7 @@
 > * [测试链接](https://feff01.github.io/mutex-box/dist/test.html)
 > * [测试链接-VUE](https://feff01.github.io/mutex-box/dist/test_vue.html)
 
-![image](https://feff01.github.io/mutex-box/dist/img/test.gif)
+![image](https://feff01.github.io/static/img/mutex_box_1.gif)
 
 
 ## 安装
@@ -19,6 +19,7 @@
 
 ## 应用
 
+> * 浏览器环境
 ```javascript
 
     /**
@@ -28,4 +29,14 @@
     //const MutexBox = require('mutex-box');
     //const MutexBox = window.MutexBox;
     
+```
+
+> * 各种JS环境
+```javascript
+    /**
+     * @description 和交互无关的JS内存模型，输入当前状态可获得各种需要输出的交互
+     */
+    import {MutexModel} from 'mutex-box';
+    //const {MutexModel} = require('mutex-box');
+    //const {MutexModel} = window.MutexBox;
 ```

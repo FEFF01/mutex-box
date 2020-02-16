@@ -7,7 +7,7 @@ document.body.appendChild(vessel);
 
 let zIndex = 0;
 let option = get_option();
-let models = Array.prototype.concat.apply([], new Array(2).fill(0).map(get_models));
+let models = Array.prototype.concat.apply([], new Array(20).fill(0).map(get_models));
 bind_element(models);
 
 let mutexBox = new MutexBox(vessel, models, option);

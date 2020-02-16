@@ -129,7 +129,10 @@ class MutexModel {
                 crossed_models,
                 [before_rect.col - crossed_rect.col, before_rect.row - crossed_rect.row]
             );
-        } else if (!this._compress(trimmed_rect, crossed_models, crossed_rect, rect)) {
+        } else if (
+            crossed_rect.colspan + crossed_rect.rowspan > (trimmed_rect.colspan + trimmed_rect.rowspan) * 2 ||
+            !this._compress(trimmed_rect, crossed_models, crossed_rect, rect)
+        ) {
             for (let i = 0; i < crossed_models.length; i++) {
                 if (this._compress(trimmed_rect, [crossed_models[i]], crossed_models[i], undefined, false)) {
                     crossed_models.splice(i--, 1);
@@ -141,7 +144,29 @@ class MutexModel {
 
             let indenting_models = [];
             let models_nrow = [];
-            let each_epoch = (capture_models, capture_features, capture_nindents) => {
+
+            crossed_rect = this.calcWrap(crossed_models);
+            let colspan = trimmed_rect.colspan -
+                Math.max(crossed_rect.col - trimmed_rect.col, 0) -
+                Math.max(
+                    trimmed_rect.col + trimmed_rect.colspan -
+                    crossed_rect.colspan - crossed_rect.col
+                    , 0
+                );
+
+            let capture_models = [
+                {
+                    col: Math.max(trimmed_rect.col, crossed_rect.col),
+                    row: trimmed_rect.row,
+                    colspan,
+                    rowspan: 0
+                }
+            ];
+            let capture_features = {};
+            let capture_nindents = [new Array(colspan).fill(trimmed_rect.rowspan)];
+
+
+            while (capture_models.length) {
                 let new_capture_features = {};
                 let new_capture_models = [];
                 let new_capture_nindents = [];
@@ -224,23 +249,11 @@ class MutexModel {
                         }
                     }
                 }
-                //console.log(3333, capture_models, capture_features, capture_nindents);
-                if (new_capture_models.length) {
-                    each_epoch(new_capture_models, new_capture_features, new_capture_nindents);
-                }
+                capture_models = new_capture_models;
+                capture_features = new_capture_features;
+                capture_nindents = new_capture_nindents;
             }
-            crossed_rect = this.calcWrap(crossed_models);
-            let colspan = trimmed_rect.colspan -
-                Math.max(crossed_rect.col - trimmed_rect.col, 0) -
-                Math.max(trimmed_rect.col + trimmed_rect.colspan - crossed_rect.colspan - crossed_rect.col, 0);
-            each_epoch([
-                {
-                    col: Math.max(trimmed_rect.col, crossed_rect.col),
-                    row: trimmed_rect.row,
-                    colspan,
-                    rowspan: 0
-                }
-            ], {}, [new Array(colspan).fill(trimmed_rect.rowspan)]);
+
 
             indenting_models.splice(0, 1);
             models_nrow.splice(0, 1);

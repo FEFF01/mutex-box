@@ -1,6 +1,6 @@
 {
   "name": "mutex-box",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "main": "./dist/mutex_box.js",
   "private":false,
   "keywords":["drag-and-drop","multi-column","grid"],

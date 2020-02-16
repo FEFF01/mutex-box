@@ -130,7 +130,7 @@ class MutexModel {
                 [before_rect.col - crossed_rect.col, before_rect.row - crossed_rect.row]
             );
         } else if (
-            crossed_rect.colspan + crossed_rect.rowspan > (trimmed_rect.colspan + trimmed_rect.rowspan) * 2 ||
+            crossed_rect.colspan + crossed_rect.rowspan > (trimmed_rect.colspan + trimmed_rect.rowspan) * 3 ||
             !this._compress(trimmed_rect, crossed_models, crossed_rect, rect)
         ) {
             for (let i = 0; i < crossed_models.length; i++) {

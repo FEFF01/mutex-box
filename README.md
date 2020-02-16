@@ -5,7 +5,8 @@
 > * 支持动态增删改元素，动态配置网格列数等等
 > * [测试链接](https://feff01.github.io/mutex-box/dist/test.html)
 > * [测试链接-VUE](https://feff01.github.io/mutex-box/dist/test_vue.html)
-![markdown](https://feff01.github.io/mutex-box/dist/img/test.gif "test")
+
+![image](https://feff01.github.io/mutex-box/dist/img/test.gif)
 
 
 ## 安装

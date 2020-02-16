@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html style="width:100%;height:100%;touch-action:none;">
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+    <style>
+        html {
+            overflow-y: scroll;
+        }
+
+        body {
+
+            padding-bottom: 100px;
+        }
+
+        .mutex-box {
+            display: block;
+            position: relative;
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            min-height: 2000px;
+            height: auto;
+            font-size: 0;
+        }
+
+        .mutex-box .mb-item {
+            position: absolute;
+            display: inline-block;
+            background-color: gray;
+            font-size: 1rem;
+            transition: all 0.2s;
+            -webkit-transition: all 0.2s;
+            /*border: 1px solid white;*/
+            box-sizing: border-box;
+            padding: 10px;
+            /*cursor: pointer;*/
+        }
+
+        @media (max-width:600px) {
+            .mutex-box .mb-item {
+                font-size: 0.8rem;
+            }
+        }
+
+        .mutex-box .mb-item code {
+            color: palegreen;
+            white-space: pre-wrap;
+        }
+
+        .mutex-box .dragging {
+            transition-property: transform;
+            -webkit-transition-property: -webkit-transform;
+            transform: scale(1.02);
+            -webkit-transform: scale(1.02);
+            box-shadow: 0 0 4px black;
+            /*pointer-events: none;*/
+        }
+    </style>
+</head>
+
+<body style="margin:0;padding:0;">
+    <footer style="position: fixed;bottom:10px;width: 100%;z-index: 10000; text-align: center;font-size: 1rem;">
+        <button id="btn_trim"> 纵向压缩 </button>
+        <button id="btn_add"> 添加一组元素 </button>
+        <button id="btn_col_dec"> 减少一列 </button>
+        <button id="btn_col_inc"> 增加一列 </button>
+    </footer>
+    <!--<ul class="mutex-box" id="test_vessel">
+    </ul>-->
+    <script async src="./js/test.js"></script>
+</body>
+
+</html>

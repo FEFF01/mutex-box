@@ -1,5 +1,5 @@
 import Vue from './vue.min.js';
-import MutexBox from './mutex_box.js';
+import MutexBox from './mutex_box.ts';
 import { get_models, get_option } from './test_data.js';
 let zIndex = 1, { ncols, space, capture } = get_option();
 new Vue({
@@ -20,7 +20,7 @@ new Vue({
             let models = get_models().map(
                 model => {
                     //指定有明确的 col row 会将现有元素排挤出去强制占用该空间
-                    model.col = undefined;  
+                    model.col = undefined;
                     return model;
                 }
             );

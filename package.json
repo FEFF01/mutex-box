@@ -1,12 +1,16 @@
 {
   "name": "mutex-box",
-  "version": "1.0.1",
+  "version": "1.0.3",
   "main": "./dist/mutex_box.js",
-  "private":false,
-  "keywords":["drag-and-drop","multi-column","grid"],
-  "repository":{
-    "type":"git",
-    "url":"git://github.com/FEFF01/mutex-box.git"
+  "private": false,
+  "keywords": [
+    "drag-and-drop",
+    "multi-column",
+    "grid"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/FEFF01/mutex-box.git"
   },
   "scripts": {
     "build": "webpack --config webpack/webpack.config.js",
@@ -27,6 +31,8 @@
     "friendly-errors-webpack-plugin": "^1.7.0",
     "html-loader": "^0.5.5",
     "html-webpack-plugin": "^3.2.0",
+    "ts-loader": "^6.2.1",
+    "typescript": "^3.7.5",
     "webpack": "^4.12.0",
     "webpack-cli": "^3.0.8",
     "webpack-dev-server": "^3.1.4"

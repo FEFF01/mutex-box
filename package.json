@@ -1,7 +1,7 @@
 {
   "name": "mutex-box",
-  "version": "1.0.3",
-  "main": "./dist/mutex_box.js",
+  "version": "1.0.4",
+  "main": "./dist/js/mutex_box.js",
   "private": false,
   "keywords": [
     "drag-and-drop",

@@ -1,6 +1,6 @@
 {
   "name": "mutex-box",
-  "version": "1.0.4",
+  "version": "1.0.6",
   "main": "./dist/js/mutex_box.js",
   "private": false,
   "keywords": [
@@ -40,6 +40,6 @@
   "dependencies": {
     "babel-polyfill": "^6.26.0",
     "babel-runtime": "^6.26.0",
-    "input-listener": "^1.1.2"
+    "input-listener": "^1.1.3"
   }
 }

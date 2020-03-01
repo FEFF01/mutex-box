@@ -19,6 +19,7 @@ module.exports = {
         }, {})),
         //vendor: ['babel-polyfill']
     },
+    devtool:'source-map',
     output: {
         path: path.resolve(__dirname, '../dist'),
         filename: 'js/[name].js',

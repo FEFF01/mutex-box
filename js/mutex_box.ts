@@ -1,7 +1,7 @@
 
 
 
-import { Model, Rect, layout, Box, CaptureFunction, Option } from './interfaces';
+import { Model, Rect, layout, Box, CaptureFunction, Options } from './interfaces';
 
 import MutexModel from './mutex_model';
 const InputListener = require('input-listener');
@@ -9,41 +9,46 @@ const InputListener = require('input-listener');
 
 class MutexBox extends MutexModel {
     inputListener?: typeof InputListener = null;
-    space: layout = { top: 0, right: 0, bottom: 0, left: 0 };
-    capture: layout | CaptureFunction = { top: 0, right: 0, bottom: 0, left: 0 };
-    private target_box?: Box = null;
+    static space: layout = { top: 0, right: 0, bottom: 0, left: 0 };
+    static capture: layout = { top: 0, right: 0, bottom: 0, left: 0 };
+    static InputListener = InputListener;
+    private target_box?: Box;
     static MutexModel = MutexModel;
-    private _longtap_timeout?: number = null;
+    private _stay_timeout?: number;
     private _client_width = 0;
     constructor(
         public vessel: HTMLElement,
         boxes?: Array<Box>,
-        option: Option = {}
+        public options: Options = {}
     ) {
-        super(boxes, option.ncols);
+        super(boxes as Array<Model>, options.ncols);
         this.vessel = vessel;
         this.inputListener = new InputListener(vessel, {
             dragStart: this.dragStart,
             dragMove: this.dragMove,
             dragEnd: this.dragEnd,
         });
-        this.resize(option);
+        this.resize(this.ncols);
         this.activate();
     }
     disable() {
-        window.removeEventListener("resize", this._window_resize);
         this.inputListener.disable();
     }
+    get capture() {
+        return this.options.capture || MutexBox.capture;
+    }
+    get space() {
+        return this.options.space || MutexBox.space;
+    }
     activate() {
-        this._window_resize();
-        window.addEventListener("resize", this._window_resize);
+        this.resize();
         this.inputListener.activate();
     }
     trim(): any {
         this._update(super.trim() as Array<Box>);
     }
-    alloc(rect: Rect, before_rect?: Rect): any {
-        this._update(super.alloc(rect, before_rect) as Array<Box>);
+    alloc(rect: Rect, before_rect?: Rect, trimmed_rect?: Rect, crossed_models?: Array<Model>): any {
+        this._update(super.alloc(rect, before_rect, trimmed_rect, crossed_models) as Array<Box>);
     }
     remove(boxes: Array<Box> | Box) {
         super.remove(boxes);
@@ -60,26 +65,24 @@ class MutexBox extends MutexModel {
         }
         this._update(boxes);
     }
-    resize(option: Option | number) {
-        if (option instanceof Object) {
-            option.space && (this.space = option.space);
-            option.capture && (this.capture = option.capture);
-            isNaN(option.ncols) || (this.ncols = option.ncols);
-        } else {
-            this.ncols = option;
+    resize = (ncols: number = this.options.ncols) => {
+        let client_width = this.options.client_width || this.vessel.clientWidth;
+        if (ncols !== this.ncols || this._client_width !== client_width) {
+            this.options.ncols = ncols;
+            this.ncols = ncols;
+            this._client_width = client_width;
+            this._update(this.model_list as Array<Box>);
         }
-        this._client_width = this.vessel.clientWidth;
-        this.update();
     }
     update(box?: Box, new_values?: Model) {
         if (box) {
+            super.clear(box);
             if (new_values instanceof Object) {
                 //Object.assign(box, new_values);
                 for (const key in new_values) {
                     box[key] = new_values[key];
                 }
             }
-            this.clear(box);
             this.alloc(box as Rect);
             this.fill(box);
             this._update([box]);
@@ -90,35 +93,51 @@ class MutexBox extends MutexModel {
     dragStart = (e: TouchEvent | MouseEvent, t: Touch | MouseEvent) => {
         //e.preventDefault();
         let rect = this.vessel.getBoundingClientRect();
-        let _left = t.clientX - rect.left, _top = t.clientY - rect.top;
+        let _left = t.clientX - rect.left;
+        let _top = t.clientY - rect.top;
         //let { col, row } = 
         this.target_box = this._get_box(_left, _top, e, t);
-        if (this.target_box) {
+        if (
+            this.target_box &&
+            !(
+                this.options.onPick &&
+                this.options.onPick(e, t, this.target_box)
+            )
+        ) {
             e.preventDefault();
             this.target_box.dragging = true;
             this.remove(this.target_box);
-            //this._md = 0;
             return;
         }
         return true;
     }
-    //_md = 0;
-    dragMove = (e: TouchEvent | MouseEvent, v2: [number, number]) => {
-        //this._md += v2[0] * v2[0] + v2[1] * v2[1];
+    private _e?: TouchEvent | MouseEvent;
+    private _t?: Touch | MouseEvent;
+    dragMove = (e: TouchEvent | MouseEvent, v2: [number, number], t: Touch | MouseEvent) => {
         this.target_box.left += v2[0];
         this.target_box.top += v2[1];
-        if (this._longtap_timeout) {
-            window.clearTimeout(this._longtap_timeout);
-            this._longtap_timeout = null;
+        if (this._stay_timeout) {
+            window.clearTimeout(this._stay_timeout);
+            this._stay_timeout = null;
         }
-        this._longtap_timeout = window.setTimeout(this._put_box, 300);
+
+        if (this.options.onMove && this.options.onMove(e, t, this.target_box)) {
+            this.inputListener.break();
+            this.target_box = null;
+            return;
+        }
+        this._e = e;
+        this._t = t;
+        this._stay_timeout = window.setTimeout(this.put, 300);
     }
-    dragEnd = (e: TouchEvent | MouseEvent) => {
-        this._longtap_timeout && window.clearTimeout(this._longtap_timeout);
-        this._put_box(true);
+    dragEnd = (e: TouchEvent | MouseEvent, t: Touch | MouseEvent) => {
+        this._stay_timeout && window.clearTimeout(this._stay_timeout);
+        this._e = e;
+        this._t = t;
+        this.put(true);
     }
     private _update(boxes: Array<Box>) {
-        let ceil_size = this.cellSize;
+        let ceil_size = this.cell_size;
         let _left, _top, _width, _height;
         for (const box of boxes) {
             let { left = 0, right = 0, top = 0, bottom = 0 } = box.space || this.space;
@@ -133,17 +152,11 @@ class MutexBox extends MutexModel {
             _height !== box.height && (box.height = _height);
         }
     }
-    get cellSize() {
+    get cell_size() {
         return this._client_width / this.ncols;
     }
-    private _window_resize = (e?: Event) => {
-        if (this._client_width !== this.vessel.clientWidth) {
-            this._client_width = this.vessel.clientWidth;
-            this._update(this.model_list as Array<Box>);
-        }
-    }
     private _get_box(px: number, py: number, e: TouchEvent | MouseEvent, t: Touch | MouseEvent): Box | undefined {
-        let ceil_size = this.cellSize;
+        let ceil_size = this.cell_size;
         let box: Box | undefined = this.getModel(px / ceil_size | 0, py / ceil_size | 0) as (Box | undefined);
 
         function _hit(length: number, distance: number, capture: number): boolean {
@@ -176,16 +189,16 @@ class MutexBox extends MutexModel {
                 let _w = box.colspan * ceil_size - space_right - space_left;
                 let _h = box.rowspan * ceil_size - space_top - space_bottom;
 
-                let zx = px - _x - _w / 2, zy = py - _y - _h / 2;
+                let zx = px - _x - _w / 2;
+                let zy = py - _y - _h / 2;
                 let zd = Math.sqrt(zx ** 2 + zy ** 2);
                 let radian = Math.atan2(zy, zx);
                 let r_h = Math.atan(_w / _h) * 2;
                 let r_v = Math.PI - r_h;
                 let _h_rv = r_v / 2;
                 let _h_pi = Math.PI / 2;
-
                 switch (true) {
-                    case radian < - _h_rv && radian > - r_h - _h_rv://top
+                    case radian < -_h_rv && radian > -r_h - _h_rv://top
                         return _hit(_h / 2, zd * Math.cos(_h_pi + radian), capture_top) && box;
                     case Math.abs(radian) <= _h_rv://right
                         return _hit(_w / 2, zd * Math.cos(radian), capture_right) && box;
@@ -197,19 +210,76 @@ class MutexBox extends MutexModel {
             }
         }
     }
-    private _put_box = (is_release?: boolean) => {
-        this._longtap_timeout = null;
-        let box = this.target_box;
-        let ceil_size = this.cellSize;
+
+    receive(e, t, box: Box) {
+        if (this.target_box) {
+            window.clearTimeout(this._stay_timeout);
+            this.put(true);
+            this.inputListener.break();
+        }
+        this.target_box = box;
+        if (e && t) {
+            this.inputListener.addPoint(t);
+            this._stay_timeout = window.setTimeout(this.put, 300);
+        } else {
+            this.put(true);
+        }
+    }
+    put = (
+        is_release?: boolean,
+        box: Box = this.target_box,
+        e: TouchEvent | MouseEvent = this._e,
+        t: Touch | MouseEvent = this._t,
+    ) => {
+        /*if (box && this.target_box) {
+          window.clearTimeout(this._stay_timeout);
+          this.putBox(true);
+          this.inputListener.break();
+        }
+        if (e && t) {
+          if (!is_release) {
+            this.target_box = box;
+            this.inputListener.addPoint(t);
+          }
+        } else {
+          e = this._e;
+          t = this._t;
+          box || (box = this.target_box);
+          this._e = undefined;
+          this._t = undefined;
+        }*/
+        this._stay_timeout = undefined;
+        let ceil_size = this.cell_size;
         let col = box.left / ceil_size, row = box.top / ceil_size;
-        this.alloc({
+        let rect = {
             col, row,
             colspan: box.colspan,
             rowspan: box.rowspan
-        }, box as Rect);
+        }
+        let trimmed_rect = this.format({ ...rect });
+        let crossed_models = this.cover(trimmed_rect);
+        let listener = (is_release ? this.options.onDrop : this.options.onStay);
+        if (listener && listener(e, t, box, crossed_models as Array<Box>)) {
+            if (!is_release) {
+                this.inputListener.break();
+            }
+            this.target_box = null;
+            return;
+        }
+        /*if (e && t) {
+          let listener = (is_release ? this.options.onDrop : this.options.onStay);
+          if (listener && listener(e, t, box, crossed_models as Array<Box>)) {
+            if (!is_release) {
+              this.inputListener.break();
+            }
+            this.target_box = null;
+            return;
+          }
+        }*/
+        this.alloc(rect, box as Rect, trimmed_rect, crossed_models);
+        this.format(box as Rect, col, row);
         if (is_release === true) {
             box.dragging = false;
-            this.format(box as Rect, col, row);
             this.fill(box);
             this._update([box]);
             this.target_box = null;
@@ -223,7 +293,8 @@ try {
 
 }
 
-//export default MutexBox;
-module.exports = MutexBox;//使用 module.exports 是为了import 和 require 都直接可用
+export { InputListener, MutexBox, MutexModel };
+export default MutexBox;
+//module.exports = MutexBox;//使用 module.exports 是为了import 和 require 都直接可用
 
 

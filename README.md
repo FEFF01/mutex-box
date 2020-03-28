@@ -5,7 +5,9 @@
 > * 支持动态增删改元素，动态配置网格列数等等
 > * [测试链接](https://feff01.github.io/mutex-box/dist/test.html)
 > * [测试链接-VUE](https://feff01.github.io/mutex-box/dist/test_vue.html)
+> * [网址导航编辑器](http://www.holdhot.com/#/editor)
 
+![image](https://feff01.github.io/static/img/holdhot_1.gif)
 ![image](https://feff01.github.io/static/img/mutex_box_1.gif)
 
 
@@ -26,7 +28,7 @@
      * @description 具体使用方式参考上两个测试链接和对应的 `test.html` `text_vue.html` 页面 
      */
     import MutexBox from 'mutex-box';
-    //const MutexBox = require('mutex-box');
+    //const MutexBox = require('mutex-box').default;
     //const MutexBox = window.MutexBox;
     
 ```

@@ -1,0 +1,38 @@
+import { Model, Rect, layout, Box, CaptureFunction, Options } from './interfaces';
+import MutexModel from './mutex_model';
+declare const InputListener: any;
+declare class MutexBox extends MutexModel {
+    vessel: HTMLElement;
+    options: Options;
+    inputListener?: typeof InputListener;
+    static space: layout;
+    static capture: layout;
+    static InputListener: any;
+    private target_box?;
+    static MutexModel: typeof MutexModel;
+    private _stay_timeout?;
+    private _client_width;
+    constructor(vessel: HTMLElement, boxes?: Array<Box>, options?: Options);
+    disable(): void;
+    get capture(): layout | CaptureFunction;
+    get space(): layout;
+    activate(): void;
+    trim(): any;
+    alloc(rect: Rect, before_rect?: Rect, trimmed_rect?: Rect, crossed_models?: Array<Model>): any;
+    remove(boxes: Array<Box> | Box): void;
+    add(boxes: Array<Box> | Box): void;
+    resize: (ncols?: number) => void;
+    update(box?: Box, new_values?: Model): void;
+    dragStart: (e: TouchEvent | MouseEvent, t: MouseEvent | Touch) => boolean;
+    private _e?;
+    private _t?;
+    dragMove: (e: TouchEvent | MouseEvent, v2: [number, number], t: MouseEvent | Touch) => void;
+    dragEnd: (e: TouchEvent | MouseEvent, t: MouseEvent | Touch) => void;
+    private _update;
+    get cell_size(): number;
+    private _get_box;
+    receive(e: any, t: any, box: Box): void;
+    put: (is_release?: boolean, box?: Box, e?: TouchEvent | MouseEvent, t?: MouseEvent | Touch) => void;
+}
+export { InputListener, MutexBox, MutexModel };
+export default MutexBox;

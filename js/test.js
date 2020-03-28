@@ -1,7 +1,9 @@
 //import MutexBox from '../dist/js/mutex_box.js'//'./mutex_box.ts'
 import { get_models, get_option } from './test_data.js';
 
-const MutexBox =require('./mutex_box.ts');//'../dist/js/mutex_box.js'
+//const MutexBox =require('../dist/js/mutex_box.js').default;
+//import MutexBox from './mutex_box.ts';
+const MutexBox =require('./mutex_box.ts').default;//'../dist/js/mutex_box.js'
 let vessel = document.createElement("ul");
 vessel.className = "mutex-box";
 document.body.appendChild(vessel);

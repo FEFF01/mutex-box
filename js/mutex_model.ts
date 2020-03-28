@@ -42,7 +42,7 @@ class MutexModel {
     }
     clear(model: Model) {
         let index = this.model_list.indexOf(model), count = 0;
-        ~index || (this.model_list.splice(index, 1));
+        ~index && (this.model_list.splice(index, 1));
         while (~(index = this.model_map.indexOf(model))) {
             count++;
             this.model_map[index] = undefined;
@@ -110,9 +110,12 @@ class MutexModel {
         }
 
     }
-    alloc(rect: Rect, before_rect?: Rect): Array<Model> {
-        let trimmed_rect = this.format({ ...rect });
-        let crossed_models = this.cover(trimmed_rect);
+    alloc(
+        rect: Rect,
+        before_rect?: Rect,
+        trimmed_rect: Rect = this.format({ ...rect }),
+        crossed_models: Array<Model> = this.cover(trimmed_rect)
+    ): Array<Model> {
         let changed_models = crossed_models.slice();
         if (crossed_models.length === 0) {
             return changed_models;
@@ -125,9 +128,10 @@ class MutexModel {
             before_rect.colspan === crossed_rect.colspan &&
             before_rect.rowspan === crossed_rect.rowspan &&
             (Math.abs(rect.col - crossed_rect.col) + Math.abs(rect.row - crossed_rect.row)) /
-            (before_rect.colspan + before_rect.rowspan) < 0.06 &&
+            (before_rect.colspan + before_rect.rowspan) < 0.1 &&
             Math.abs(before_rect.col - crossed_rect.col) / before_rect.colspan +
-            Math.abs(before_rect.row - crossed_rect.row) / before_rect.rowspan > 1
+            Math.abs(before_rect.row - crossed_rect.row) / before_rect.rowspan > 1 &&
+            this.cover(before_rect).length === 0
         ) {
             this.move(
                 crossed_models,
@@ -135,14 +139,37 @@ class MutexModel {
             );
         } else if (
             (
-                crossed_models.length > 1 &&
-                crossed_rect.colspan + crossed_rect.rowspan > (trimmed_rect.colspan + trimmed_rect.rowspan) * 2
+                crossed_rect.colspan + crossed_rect.rowspan >
+                (trimmed_rect.colspan + trimmed_rect.rowspan) * 1.6
             ) ||
             !this._compress(trimmed_rect, crossed_models, crossed_rect, rect)
         ) {
+            crossed_models.sort((a, b) => a.row - b.row);
+            let cascading_trimmed_rect = { ...trimmed_rect };
             for (let i = 0; i < crossed_models.length; i++) {
-                if (this._compress(trimmed_rect, [crossed_models[i]], crossed_models[i] as Rect, undefined, false)) {
+                let crossed_model = crossed_models[i];
+                if (
+                    this._compress(
+                        cascading_trimmed_rect,
+                        [crossed_model],
+                        crossed_model as Rect,
+                        undefined,
+                        false
+                    )) {
                     crossed_models.splice(i--, 1);
+                } else {
+                    if (cascading_trimmed_rect.col > crossed_model.col) {
+                        cascading_trimmed_rect.colspan +=
+                            cascading_trimmed_rect.col - crossed_model.col;
+                        cascading_trimmed_rect.col = crossed_model.col;
+                    }
+                    if (
+                        cascading_trimmed_rect.col + cascading_trimmed_rect.colspan <
+                        crossed_model.col + crossed_model.colspan
+                    ) {
+                        cascading_trimmed_rect.colspan =
+                            crossed_model.col + crossed_model.colspan - cascading_trimmed_rect.col;
+                    }
                 }
             }
             if (crossed_models.length === 0) {
@@ -169,13 +196,17 @@ class MutexModel {
                     rowspan: 0
                 }
             ];
-            let capture_features: { [key: number]: Array<{ row: number, rowspan: number }> } = {};
+            let capture_features: {
+                [key: number]: Array<{ row: number, rowspan: number }>
+            } = {};
             let capture_nindents: Array<number[] | number> = [new Array(colspan).fill(trimmed_rect.rowspan)];
 
 
             while (capture_models.length) {
                 let new_capture_models: Model[] = [];
-                let new_capture_features: { [key: number]: Array<{ row: number, rowspan: number }> } = {};
+                let new_capture_features: {
+                    [key: number]: Array<{ row: number, rowspan: number }>
+                } = {};
                 let new_capture_nindents: Array<number[] | number> = [];
                 for (const key in capture_features) {
                     capture_features[key].sort((a, b) => a.row - b.row);
@@ -407,8 +438,11 @@ class MutexModel {
         rect?: Rect,
         use_bw = true
     ): boolean {
-        let hf = trimmed_rect.rowspan / trimmed_rect.colspan/* / crossed_rect.rowspan*/;
-        let vf = crossed_rect.colspan / crossed_rect.rowspan/* / trimmed_rect.colspan*/;
+        let vf = crossed_rect.colspan / crossed_rect.rowspan;
+        let hf = trimmed_rect.rowspan / trimmed_rect.colspan;
+        let f = (vf + hf) / 4;
+        vf = f + vf / 2;
+        hf = f + hf / 2;
         let trimmed_offset = this.calcOffset(trimmed_rect, crossed_rect);
         let offset = rect ? this.calcOffset(rect, crossed_rect) : trimmed_offset;
         let lw: any[] = [Math.abs(hf * offset.l), [trimmed_offset.l, 0]], rw: any[] = [Math.abs(hf * offset.r), [trimmed_offset.r, 0], lw];

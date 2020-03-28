@@ -30,12 +30,19 @@ interface Box extends Model {
     capture?: layout | CaptureFunction
 }
 interface CaptureFunction {
-    (e: TouchEvent | MouseEvent, t: Touch | MouseEvent, model: Box): boolean | Box | undefined
+    (e: TouchEvent | MouseEvent, t?: Touch | MouseEvent, ...boxes: Array<Box | Array<Box>>): boolean | Box | undefined
 }
-interface Option {
+interface Options {
     ncols?: number,
     space?: layout,
-    capture?: layout | CaptureFunction
+    capture?: layout | CaptureFunction,
+    onPick?: CaptureFunction;
+    onMove?: CaptureFunction;
+    onStay?: CaptureFunction;
+    onDrop?: CaptureFunction;
+    resize?: boolean,
+    client_width?: number
+
 }
 
-export {Model,Rect,layout,Box,CaptureFunction,Option};
+export { Model, Rect, layout, Box, CaptureFunction, Options };

@@ -19,15 +19,16 @@ module.exports = {
         }, {})),
         //vendor: ['babel-polyfill']
     },
-    devtool:'source-map',
+    devtool: 'source-map',
     output: {
         path: path.resolve(__dirname, '../dist'),
         filename: 'js/[name].js',
         chunkFilename: 'js/[id].js',
+        globalObject: "this",
         libraryTarget: "umd"
     },
     module: {
-        unknownContextCritical:false,
+        unknownContextCritical: false,
         rules: [
             {
                 test: /\.tsx?$/,
@@ -39,7 +40,7 @@ module.exports = {
                 use: [{
                     loader: "html-loader",
                     options: {
-                        attrs: "false"
+                        //attrs: "false"
                     }
                 }]
             }, {
@@ -67,7 +68,7 @@ module.exports = {
                 },
             }],
     },
-    
+
     resolve: {
         extensions: ['.js', '.ts', '.tsx']
     },

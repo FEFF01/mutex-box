@@ -16,9 +16,4 @@ let devWebpackConfig = Object.assign(config, {
     /*module: {},*/ mode: 'development',
     devtool: '#source-map'
 });
-devWebpackConfig.plugins.push(new FriendlyErrorsPlugin({
-    compilationSuccessInfo: {
-        messages: [`Your application is running here: http://localhost:8000 \n`],
-    }
-}))
 module.exports = devWebpackConfig;

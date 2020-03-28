@@ -1,10 +1,4 @@
-<!DOCTYPE html>
-<html style="width:100%;height:100%;touch-action:none;">
-
-<head>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
-    <style>
-        html {
+<!doctype html><html style="width:100%;height:100%;touch-action:none;"><head><meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no"/><style>html {
             overflow-y: scroll;
         }
 
@@ -55,13 +49,7 @@
             box-shadow: 0 0 4px black;
             z-index: 10;
             /*pointer-events: none;*/
-        }
-    </style>
-</head>
-
-<body style="margin:0;padding:0;">
-    <ul class="mutex-box" id="test_vessel">
-        <li v-for="model of models" class="mb-item" v-bind:class="
+        }</style></head><body style="margin:0;padding:0;"><ul class="mutex-box" id="test_vessel"><li v-for="model of models" class="mb-item" v-bind:class="
         {dragging:model.dragging}
         " v-bind:style="
             {
@@ -71,16 +59,4 @@
                 height:model.height+'px',
                 ...model.style
             }
-            " v-html="model.innerHTML">
-        </li>
-        <li style="position: fixed;bottom:10px;width: 100%;z-index: 10000; text-align: center;font-size: 1rem;">
-            <button @click="mutexBox.trim()"> 纵向压缩 </button>
-            <button @click="add_models"> 添加一组元素 </button>
-            <button @click="mutexBox.resize(--ncols)"> 减少一列 </button>
-            <button @click="mutexBox.resize(++ncols)"> 增加一列 </button>
-        </li>
-    </ul>
-    <script async src="./js/test_vue.js"></script>
-</body>
-
-</html>
+            " v-html="model.innerHTML"></li><li style="position: fixed;bottom:10px;width: 100%;z-index: 10000; text-align: center;font-size: 1rem;"><button @click="mutexBox.trim()">纵向压缩</button> <button @click="add_models">添加一组元素</button> <button @click="mutexBox.resize(--ncols)">减少一列</button> <button @click="mutexBox.resize(++ncols)">增加一列</button></li></ul><script async src="./js/test_vue.js"></script></body></html>

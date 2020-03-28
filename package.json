@@ -1,6 +1,6 @@
 {
   "name": "mutex-box",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "main": "./dist/js/mutex_box.js",
   "private": false,
   "license": "MIT",
@@ -19,28 +19,28 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "devDependencies": {
-    "@babel/core": "^7.7.7",
-    "@babel/preset-env": "^7.7.7",
-    "babel-loader": "^8.0.6",
+    "@babel/core": "^7.9.0",
+    "@babel/preset-env": "^7.9.0",
+    "babel-loader": "^8.1.0",
     "babel-plugin-transform-class-properties": "^6.24.1",
     "babel-plugin-transform-es2015-for-of": "^6.23.0",
     "babel-plugin-transform-es2015-modules-commonjs": "^6.26.2",
     "babel-plugin-transform-runtime": "^6.23.0",
     "clean-webpack-plugin": "^3.0.0",
     "copy-webpack-plugin": "^5.1.1",
-    "file-loader": "^5.0.2",
+    "file-loader": "^6.0.0",
     "friendly-errors-webpack-plugin": "^1.7.0",
     "html-loader": "^0.5.5",
-    "html-webpack-plugin": "^3.2.0",
-    "ts-loader": "^6.2.1",
-    "typescript": "^3.7.5",
-    "webpack": "^4.12.0",
-    "webpack-cli": "^3.0.8",
-    "webpack-dev-server": "^3.1.4"
+    "html-webpack-plugin": "^4.0.3",
+    "ts-loader": "^6.2.2",
+    "typescript": "^3.8.3",
+    "webpack": "^4.42.1",
+    "webpack-cli": "^3.3.11",
+    "webpack-dev-server": "^3.10.3"
   },
   "dependencies": {
     "babel-polyfill": "^6.26.0",
     "babel-runtime": "^6.26.0",
-    "input-listener": "^1.1.4"
+    "input-listener": "^1.1.5"
   }
 }

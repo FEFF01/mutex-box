@@ -18,7 +18,7 @@ class MutexBox extends MutexModel {
     private _client_width = 0;
     constructor(
         public vessel: HTMLElement,
-        boxes?: Array<Box>,
+        boxes: Array<Box>,
         public options: Options = {}
     ) {
         super(boxes as Array<Model>, options.ncols);
@@ -231,23 +231,6 @@ class MutexBox extends MutexModel {
         e: TouchEvent | MouseEvent = this._e,
         t: Touch | MouseEvent = this._t,
     ) => {
-        /*if (box && this.target_box) {
-          window.clearTimeout(this._stay_timeout);
-          this.putBox(true);
-          this.inputListener.break();
-        }
-        if (e && t) {
-          if (!is_release) {
-            this.target_box = box;
-            this.inputListener.addPoint(t);
-          }
-        } else {
-          e = this._e;
-          t = this._t;
-          box || (box = this.target_box);
-          this._e = undefined;
-          this._t = undefined;
-        }*/
         this._stay_timeout = undefined;
         let ceil_size = this.cell_size;
         let col = box.left / ceil_size, row = box.top / ceil_size;
@@ -266,16 +249,6 @@ class MutexBox extends MutexModel {
             this.target_box = null;
             return;
         }
-        /*if (e && t) {
-          let listener = (is_release ? this.options.onDrop : this.options.onStay);
-          if (listener && listener(e, t, box, crossed_models as Array<Box>)) {
-            if (!is_release) {
-              this.inputListener.break();
-            }
-            this.target_box = null;
-            return;
-          }
-        }*/
         this.alloc(rect, box as Rect, trimmed_rect, crossed_models);
         this.format(box as Rect, col, row);
         if (is_release === true) {

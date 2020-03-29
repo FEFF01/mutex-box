@@ -10,7 +10,7 @@ declare class MutexModel {
     protected model_list: Array<Model>;
     static STATES: typeof STATES;
     _ncols: number;
-    constructor(models: Array<Model>, ncols?: number);
+    constructor(models?: Array<Model>, ncols?: number);
     get ncols(): number;
     set ncols(ncols: number);
     fill(models: Array<Model> | Model): void;

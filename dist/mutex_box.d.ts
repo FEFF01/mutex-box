@@ -12,7 +12,7 @@ declare class MutexBox extends MutexModel {
     static MutexModel: typeof MutexModel;
     private _stay_timeout?;
     private _client_width;
-    constructor(vessel: HTMLElement, boxes?: Array<Box>, options?: Options);
+    constructor(vessel: HTMLElement, boxes: Array<Box>, options?: Options);
     disable(): void;
     get capture(): layout | CaptureFunction;
     get space(): layout;

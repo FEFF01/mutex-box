@@ -13,7 +13,7 @@ class MutexModel {
     static STATES = STATES;
     _ncols: number = null;
     constructor(
-        models: Array<Model>,
+        models: Array<Model> = [],
         ncols: number =
             models.reduce(
                 (ncols, model) => Math.max(ncols, (model.col || 0) + (model.colspan || 1))
@@ -127,8 +127,8 @@ class MutexModel {
             trimmed_rect.row === crossed_rect.row &&
             before_rect.colspan === crossed_rect.colspan &&
             before_rect.rowspan === crossed_rect.rowspan &&
-            (Math.abs(rect.col - crossed_rect.col) + Math.abs(rect.row - crossed_rect.row)) /
-            (before_rect.colspan + before_rect.rowspan) < 0.1 &&
+            (Math.abs(rect.col - crossed_rect.col) / before_rect.colspan +
+                Math.abs(rect.row - crossed_rect.row)) / before_rect.rowspan < 0.1 &&
             Math.abs(before_rect.col - crossed_rect.col) / before_rect.colspan +
             Math.abs(before_rect.row - crossed_rect.row) / before_rect.rowspan > 1 &&
             this.cover(before_rect).length === 0

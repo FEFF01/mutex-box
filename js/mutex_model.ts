@@ -1,5 +1,5 @@
 
-import { Model, Rect } from './interfaces';
+import { Model, Rect, Options } from './interfaces';
 
 enum STATES {
     USE_CHECK = 0x01,
@@ -11,29 +11,41 @@ class MutexModel {
     protected model_map: Array<Model | undefined> = new Array();
     protected model_list: Array<Model> = new Array();
     static STATES = STATES;
-    _ncols: number = null;
+    //_ncols: number = undefined;
     constructor(
         models: Array<Model> = [],
-        ncols: number =
-            models.reduce(
+        public options: Options = {}
+    ) {
+        if (!(this.options.ncols > 0)) {
+            this.options.ncols = models.reduce(
                 (ncols, model) => Math.max(ncols, (model.col || 0) + (model.colspan || 1))
                 , 1
-            )
-    ) {
-        this.model_list = this.model_list.concat(models);
-        this.ncols = ncols;
+            );
+        }
+        let dirty_data = this._fill(models, MutexModel.STATES.USE_CHECK | MutexModel.STATES.FILL_EACHMODEL);
+        this.append(dirty_data);
     }
     get ncols(): number {
-        return this._ncols;
+        return this.options.ncols;
     }
     set ncols(ncols: number) {
-        if (ncols !== this._ncols) {
-            this._ncols = ncols;
+        this.setNCols(ncols);
+    }
+    setNCols(ncols: number, left_expand?: boolean | number) {
+        if (ncols !== this.options.ncols) {
             this.model_map.splice(0, this.model_map.length);
             let model_list = this.model_list.splice(0, this.model_list.length);
+            if (left_expand && left_expand !== 1) {
+                let nincs = ncols - this.options.ncols;
+                for (const model of model_list) {
+                    model.col += nincs;
+                }
+            }
+            this.options.ncols = ncols;
             let dirty_data = this._fill(model_list, MutexModel.STATES.USE_CHECK | MutexModel.STATES.FILL_EACHMODEL);
             this.append(dirty_data);
         }
+
     }
 
     fill(models: Array<Model> | Model) {
@@ -356,7 +368,7 @@ class MutexModel {
             if (flags & STATES.USE_CHECK) {
                 isFinite(model.colspan) || (model.colspan = 1);
                 isFinite(model.rowspan) || (model.rowspan = 1);
-                if (isNaN(model.col + model.row) || model.col + model.colspan > ncols) {
+                if (isNaN(model.col + model.row) || model.col < 0 || model.col + model.colspan > ncols) {
                     dirty_data.push(model);
                     continue;
                 }

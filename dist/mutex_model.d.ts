@@ -1,4 +1,4 @@
-import { Model, Rect } from './interfaces';
+import { Model, Rect, Options } from './interfaces';
 declare enum STATES {
     USE_CHECK = 1,
     FILL_EACHMODEL = 16,
@@ -6,13 +6,14 @@ declare enum STATES {
     USE_EACHOFFSET = 4096
 }
 declare class MutexModel {
+    options: Options;
     protected model_map: Array<Model | undefined>;
     protected model_list: Array<Model>;
     static STATES: typeof STATES;
-    _ncols: number;
-    constructor(models?: Array<Model>, ncols?: number);
+    constructor(models?: Array<Model>, options?: Options);
     get ncols(): number;
     set ncols(ncols: number);
+    setNCols(ncols: number, left_expand?: boolean | number): void;
     fill(models: Array<Model> | Model): void;
     clear(model: Model): number;
     remove(models: Array<Model> | Model): void;

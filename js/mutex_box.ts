@@ -19,16 +19,15 @@ class MutexBox extends MutexModel {
     constructor(
         public vessel: HTMLElement,
         boxes: Array<Box>,
-        public options: Options = {}
+        options: Options = {}
     ) {
-        super(boxes as Array<Model>, options.ncols);
+        super(boxes as Array<Model>, options);
         this.vessel = vessel;
         this.inputListener = new InputListener(vessel, {
             dragStart: this.dragStart,
             dragMove: this.dragMove,
             dragEnd: this.dragEnd,
         });
-        this.resize(this.ncols);
         this.activate();
     }
     disable() {
@@ -65,14 +64,16 @@ class MutexBox extends MutexModel {
         }
         this._update(boxes);
     }
-    resize = (ncols: number = this.options.ncols) => {
-        let client_width = this.options.client_width || this.vessel.clientWidth;
+    resize = (ncols: number = this.options.ncols, direction?: boolean | number) => {
+        let client_width = this.clientWidth;
         if (ncols !== this.ncols || this._client_width !== client_width) {
-            this.options.ncols = ncols;
-            this.ncols = ncols;
+            this.setNCols(ncols, direction)
             this._client_width = client_width;
             this._update(this.model_list as Array<Box>);
         }
+    }
+    get clientWidth() {
+        return isFinite(this.options.client_width) ? this.options.client_width : this.vessel.clientWidth;
     }
     update(box?: Box, new_values?: Model) {
         if (box) {
@@ -137,14 +138,14 @@ class MutexBox extends MutexModel {
         this.put(true);
     }
     private _update(boxes: Array<Box>) {
-        let ceil_size = this.cell_size;
+        let cell_size = this.cellSize;
         let _left, _top, _width, _height;
         for (const box of boxes) {
             let { left = 0, right = 0, top = 0, bottom = 0 } = box.space || this.space;
-            _left = ceil_size * box.col + left;
-            _top = ceil_size * box.row + top;
-            _width = ceil_size * box.colspan - left - right;
-            _height = ceil_size * box.rowspan - top - bottom;
+            _left = cell_size * box.col + left;
+            _top = cell_size * box.row + top;
+            _width = cell_size * box.colspan - left - right;
+            _height = cell_size * box.rowspan - top - bottom;
 
             _left !== box.left && (box.left = _left);
             _top !== box.top && (box.top = _top);
@@ -152,12 +153,12 @@ class MutexBox extends MutexModel {
             _height !== box.height && (box.height = _height);
         }
     }
-    get cell_size() {
-        return this._client_width / this.ncols;
+    get cellSize() {
+        return this.clientWidth / this.ncols;
     }
     private _get_box(px: number, py: number, e: TouchEvent | MouseEvent, t: Touch | MouseEvent): Box | undefined {
-        let ceil_size = this.cell_size;
-        let box: Box | undefined = this.getModel(px / ceil_size | 0, py / ceil_size | 0) as (Box | undefined);
+        let cell_size = this.cellSize;
+        let box: Box | undefined = this.getModel(px / cell_size | 0, py / cell_size | 0) as (Box | undefined);
 
         function _hit(length: number, distance: number, capture: number): boolean {
             if (capture >= 0) {
@@ -184,10 +185,10 @@ class MutexBox extends MutexModel {
                     bottom: capture_bottom = 0,
                     left: capture_left = 0
                 } = capture;
-                let _x = box.col * ceil_size + space_left;
-                let _y = box.row * ceil_size + space_top;
-                let _w = box.colspan * ceil_size - space_right - space_left;
-                let _h = box.rowspan * ceil_size - space_top - space_bottom;
+                let _x = box.col * cell_size + space_left;
+                let _y = box.row * cell_size + space_top;
+                let _w = box.colspan * cell_size - space_right - space_left;
+                let _h = box.rowspan * cell_size - space_top - space_bottom;
 
                 let zx = px - _x - _w / 2;
                 let zy = py - _y - _h / 2;
@@ -232,8 +233,8 @@ class MutexBox extends MutexModel {
         t: Touch | MouseEvent = this._t,
     ) => {
         this._stay_timeout = undefined;
-        let ceil_size = this.cell_size;
-        let col = box.left / ceil_size, row = box.top / ceil_size;
+        let cell_size = this.cellSize;
+        let col = box.left / cell_size, row = box.top / cell_size;
         let rect = {
             col, row,
             colspan: box.colspan,

@@ -3,7 +3,6 @@ import MutexModel from './mutex_model';
 declare const InputListener: any;
 declare class MutexBox extends MutexModel {
     vessel: HTMLElement;
-    options: Options;
     inputListener?: typeof InputListener;
     static space: layout;
     static capture: layout;
@@ -21,7 +20,8 @@ declare class MutexBox extends MutexModel {
     alloc(rect: Rect, before_rect?: Rect, trimmed_rect?: Rect, crossed_models?: Array<Model>): any;
     remove(boxes: Array<Box> | Box): void;
     add(boxes: Array<Box> | Box): void;
-    resize: (ncols?: number) => void;
+    resize: (ncols?: number, direction?: number | boolean) => void;
+    get clientWidth(): number;
     update(box?: Box, new_values?: Model): void;
     dragStart: (e: TouchEvent | MouseEvent, t: MouseEvent | Touch) => boolean;
     private _e?;
@@ -29,7 +29,7 @@ declare class MutexBox extends MutexModel {
     dragMove: (e: TouchEvent | MouseEvent, v2: [number, number], t: MouseEvent | Touch) => void;
     dragEnd: (e: TouchEvent | MouseEvent, t: MouseEvent | Touch) => void;
     private _update;
-    get cell_size(): number;
+    get cellSize(): number;
     private _get_box;
     receive(e: any, t: any, box: Box): void;
     put: (is_release?: boolean, box?: Box, e?: TouchEvent | MouseEvent, t?: MouseEvent | Touch) => void;

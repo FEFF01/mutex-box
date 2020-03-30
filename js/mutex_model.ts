@@ -1,7 +1,7 @@
 
 import { Model, Rect, Options } from './interfaces';
 
-enum STATES {
+enum FLAGS {
     USE_CHECK = 0x01,
     FILL_EACHMODEL = 0x10,
     USE_OFFSET = 0x100,
@@ -10,7 +10,7 @@ enum STATES {
 class MutexModel {
     protected model_map: Array<Model | undefined> = new Array();
     protected model_list: Array<Model> = new Array();
-    static STATES = STATES;
+    static FLAGS = FLAGS;
     //_ncols: number = undefined;
     constructor(
         models: Array<Model> = [],
@@ -22,7 +22,7 @@ class MutexModel {
                 , 1
             );
         }
-        let dirty_data = this._fill(models, MutexModel.STATES.USE_CHECK | MutexModel.STATES.FILL_EACHMODEL);
+        let dirty_data = this._fill(models, MutexModel.FLAGS.USE_CHECK | MutexModel.FLAGS.FILL_EACHMODEL);
         this.append(dirty_data);
     }
     get ncols(): number {
@@ -42,7 +42,7 @@ class MutexModel {
                 }
             }
             this.options.ncols = ncols;
-            let dirty_data = this._fill(model_list, MutexModel.STATES.USE_CHECK | MutexModel.STATES.FILL_EACHMODEL);
+            let dirty_data = this._fill(model_list, MutexModel.FLAGS.USE_CHECK | MutexModel.FLAGS.FILL_EACHMODEL);
             this.append(dirty_data);
         }
 
@@ -50,7 +50,7 @@ class MutexModel {
 
     fill(models: Array<Model> | Model) {
         models instanceof Array || (models = [models]);
-        this._fill(models, MutexModel.STATES.FILL_EACHMODEL);
+        this._fill(models, MutexModel.FLAGS.FILL_EACHMODEL);
     }
     clear(model: Model) {
         let index = this.model_list.indexOf(model), count = 0;
@@ -68,7 +68,7 @@ class MutexModel {
     move(models: Array<Model> | Model, v2: [number, number] | Array<[number, number]>, flags: number = 0) {
         models instanceof Array || (models = [models]);
         this.remove(models);
-        this._fill(models, flags | MutexModel.STATES.FILL_EACHMODEL | MutexModel.STATES.USE_OFFSET, v2);
+        return this._fill(models, flags | MutexModel.FLAGS.FILL_EACHMODEL | MutexModel.FLAGS.USE_OFFSET, v2);
     }
     getModel(col: number, row: number): Model | undefined {
         if (col >= 0 && row >= 0 && col < this.ncols) {
@@ -118,39 +118,24 @@ class MutexModel {
             }
             model.col = optimal_col;
             model.row = nrows - max_offset;
-            this._fill([model], MutexModel.STATES.FILL_EACHMODEL);
+            this._fill([model], MutexModel.FLAGS.FILL_EACHMODEL);
         }
 
     }
     alloc(
         rect: Rect,
-        before_rect?: Rect,
-        trimmed_rect: Rect = this.format({ ...rect }),
+        trimmed_rect: Rect = this.format(
+            { col: rect.col, row: rect.row, colspan: rect.colspan, rowspan: rect.rowspan }
+        ),
         crossed_models: Array<Model> = this.cover(trimmed_rect),
-        size_ratio: number = 1
+        crossed_rect?: Rect
     ): Array<Model> {
         let changed_models = crossed_models.slice();
         if (crossed_models.length === 0) {
             return changed_models;
         }
-        let crossed_rect = this.calcWrap(crossed_models);
+        crossed_rect || (crossed_rect = this.calcWrap(crossed_models));
         if (
-            before_rect &&
-            trimmed_rect.col === crossed_rect.col &&
-            trimmed_rect.row === crossed_rect.row &&
-            before_rect.colspan === crossed_rect.colspan &&
-            before_rect.rowspan === crossed_rect.rowspan &&
-            (Math.abs(rect.col - crossed_rect.col) +
-                Math.abs(rect.row - crossed_rect.row)) < 0.1 / size_ratio &&
-            Math.abs(before_rect.col - crossed_rect.col) / before_rect.colspan +
-            Math.abs(before_rect.row - crossed_rect.row) / before_rect.rowspan > 1 &&
-            this.cover(before_rect).length === 0
-        ) {
-            this.move(
-                crossed_models,
-                [before_rect.col - crossed_rect.col, before_rect.row - crossed_rect.row]
-            );
-        } else if (
             (
                 crossed_rect.colspan + crossed_rect.rowspan >
                 (trimmed_rect.colspan + trimmed_rect.rowspan) * 1.6
@@ -309,7 +294,7 @@ class MutexModel {
             indenting_models.splice(0, 1);
             models_nrow.splice(0, 1);
 
-            this.move(indenting_models, models_nrow.map((row): [number, number] => [0, row]), MutexModel.STATES.USE_EACHOFFSET);
+            this.move(indenting_models, models_nrow.map((row): [number, number] => [0, row]), MutexModel.FLAGS.USE_EACHOFFSET);
             changed_models = changed_models.concat(indenting_models);
         }
         return changed_models;
@@ -356,8 +341,8 @@ class MutexModel {
         }
     }
     private _fill(models: Model[], flags: number | undefined = 0, arg?: any): Array<Model> | undefined {
-        const STATES = MutexModel.STATES;
-        let dirty_data: Array<Model> | undefined = flags & STATES.USE_CHECK ? [] : undefined;
+        const FLAGS = MutexModel.FLAGS;
+        let dirty_data: Array<Model> | undefined = flags & FLAGS.USE_CHECK ? [] : undefined;
         let model_map = this.model_map;
         let model_list = this.model_list;
         let ncols = this.ncols;
@@ -366,7 +351,7 @@ class MutexModel {
             let model = models[index];
 
 
-            if (flags & STATES.USE_CHECK) {
+            if (flags & FLAGS.USE_CHECK) {
                 isFinite(model.colspan) || (model.colspan = 1);
                 isFinite(model.rowspan) || (model.rowspan = 1);
                 if (isNaN(model.col + model.row) || model.col < 0 || model.col + model.colspan > ncols) {
@@ -376,7 +361,7 @@ class MutexModel {
             }
 
             let list_index = model_list.indexOf(model);
-            if (flags & STATES.FILL_EACHMODEL) {
+            if (flags & FLAGS.FILL_EACHMODEL) {
                 if (list_index === -1) {
                     model_list.push(model);
                 } else {
@@ -388,10 +373,10 @@ class MutexModel {
                 }
             }
 
-            if (flags & STATES.USE_EACHOFFSET) {
+            if (flags & FLAGS.USE_EACHOFFSET) {
                 model.col += arg[index][0];
                 model.row += arg[index][1];
-            } else if (flags & STATES.USE_OFFSET) {
+            } else if (flags & FLAGS.USE_OFFSET) {
                 model.col += arg[0];
                 model.row += arg[1];
             }
@@ -400,8 +385,8 @@ class MutexModel {
             for (let r = 0; r < rowspan; r++) {
                 for (let c = 0; c < colspan; c++) {
                     let idx = (c + col) + (r + row) * ncols;
-                    if (!(flags & STATES.USE_CHECK) || model_map[idx] === undefined) {
-                        model_map[idx] = flags & STATES.FILL_EACHMODEL ? model : arg;
+                    if (!(flags & FLAGS.USE_CHECK) || model_map[idx] === undefined) {
+                        model_map[idx] = flags & FLAGS.FILL_EACHMODEL ? model : arg;
                     } else {
                         do {
                             while (c--) {
@@ -409,7 +394,7 @@ class MutexModel {
                             }
                             c = colspan;
                         } while (r--)
-                        flags & STATES.FILL_EACHMODEL && (model_list.pop());
+                        flags & FLAGS.FILL_EACHMODEL && (model_list.pop());
                         dirty_data.push(model);
                         continue next_model;
                     }

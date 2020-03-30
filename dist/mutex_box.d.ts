@@ -1,4 +1,4 @@
-import { Model, Rect, layout, Box, CaptureFunction, Options } from './interfaces';
+import { Model, layout, Box, CaptureFunction, Options } from './interfaces';
 import MutexModel from './mutex_model';
 declare const InputListener: any;
 declare class MutexBox extends MutexModel {
@@ -16,8 +16,6 @@ declare class MutexBox extends MutexModel {
     get capture(): layout | CaptureFunction;
     get space(): layout;
     activate(): void;
-    trim(): any;
-    alloc(rect: Rect, before_rect?: Rect, trimmed_rect?: Rect, crossed_models?: Array<Model>, size_ratio?: number): any;
     remove(boxes: Array<Box> | Box): void;
     add(boxes: Array<Box> | Box): void;
     resize: (ncols?: number, direction?: number | boolean) => void;
@@ -31,7 +29,8 @@ declare class MutexBox extends MutexModel {
     private _update;
     get cellSize(): number;
     private _get_box;
-    receive(e: any, t: any, box: Box): void;
+    receive(e?: TouchEvent | MouseEvent, t?: Touch | MouseEvent, box?: Box): void;
+    move(models: Array<Box> | Box, v2: [number, number] | Array<[number, number]>, flags?: number): Model[];
     put: (is_release?: boolean, box?: Box, e?: TouchEvent | MouseEvent, t?: MouseEvent | Touch) => void;
 }
 export { InputListener, MutexBox, MutexModel };

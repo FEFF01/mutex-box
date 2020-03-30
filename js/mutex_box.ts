@@ -43,12 +43,6 @@ class MutexBox extends MutexModel {
         this.resize();
         this.inputListener.activate();
     }
-    trim(): any {
-        this._update(super.trim() as Array<Box>);
-    }
-    alloc(rect: Rect, before_rect?: Rect, trimmed_rect?: Rect, crossed_models?: Array<Model>, size_ratio?: number): any {
-        this._update(super.alloc(rect, before_rect, trimmed_rect, crossed_models, size_ratio) as Array<Box>);
-    }
     remove(boxes: Array<Box> | Box) {
         super.remove(boxes);
     }
@@ -86,7 +80,7 @@ class MutexBox extends MutexModel {
             }
             this.alloc(box as Rect);
             this.fill(box);
-            this._update([box]);
+            this._update(box);
         } else {
             this._update(this.model_list as Array<Box>);
         }
@@ -137,7 +131,8 @@ class MutexBox extends MutexModel {
         this._t = t;
         this.put(true);
     }
-    private _update(boxes: Array<Box>) {
+    private _update(boxes: Box | Array<Box>) {
+        boxes instanceof Array || (boxes = [boxes]);
         let cell_size = this.cellSize;
         let _left, _top, _width, _height;
         for (const box of boxes) {
@@ -211,8 +206,7 @@ class MutexBox extends MutexModel {
             }
         }
     }
-
-    receive(e, t, box: Box) {
+    receive(e?: TouchEvent | MouseEvent, t?: Touch | MouseEvent, box?: Box) {
         if (this.target_box) {
             window.clearTimeout(this._stay_timeout);
             this.put(true);
@@ -225,6 +219,11 @@ class MutexBox extends MutexModel {
         } else {
             this.put(true);
         }
+    }
+    move(models: Array<Box> | Box, v2: [number, number] | Array<[number, number]>, flags: number = 0) {
+        let dirty_data = super.move(models, v2, flags);
+        this._update(models);
+        return dirty_data;
     }
     put = (
         is_release?: boolean,
@@ -251,7 +250,26 @@ class MutexBox extends MutexModel {
             this.target_box = null;
             return;
         }
-        this.alloc(rect, box as Rect, trimmed_rect, crossed_models, Math.sqrt(cell_size / 60));
+        if (crossed_models.length) {
+            let crossed_rect = this.calcWrap(crossed_models);
+            if (
+                trimmed_rect.col === crossed_rect.col &&
+                trimmed_rect.row === crossed_rect.row &&
+                box.colspan === crossed_rect.colspan &&
+                box.rowspan === crossed_rect.rowspan &&
+                (Math.abs(rect.col - crossed_rect.col) +
+                    Math.abs(rect.row - crossed_rect.row)) < 0.1 / Math.sqrt(cell_size / 60) &&
+                Math.abs(box.col - crossed_rect.col) / box.colspan +
+                Math.abs(box.row - crossed_rect.row) / box.rowspan > 1
+            ) {
+                this.move(
+                    crossed_models as Array<Box>,
+                    [box.col - crossed_rect.col, box.row - crossed_rect.row]
+                );
+            } else {
+                this.alloc(rect, trimmed_rect, crossed_models, crossed_rect);
+            }
+        }
         this.format(box as Rect, col, row);
         if (is_release === true) {
             box.dragging = false;

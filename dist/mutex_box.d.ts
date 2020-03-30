@@ -17,7 +17,7 @@ declare class MutexBox extends MutexModel {
     get space(): layout;
     activate(): void;
     trim(): any;
-    alloc(rect: Rect, before_rect?: Rect, trimmed_rect?: Rect, crossed_models?: Array<Model>): any;
+    alloc(rect: Rect, before_rect?: Rect, trimmed_rect?: Rect, crossed_models?: Array<Model>, size_ratio?: number): any;
     remove(boxes: Array<Box> | Box): void;
     add(boxes: Array<Box> | Box): void;
     resize: (ncols?: number, direction?: number | boolean) => void;

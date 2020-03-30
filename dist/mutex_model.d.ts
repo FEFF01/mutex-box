@@ -22,7 +22,7 @@ declare class MutexModel {
     format(rect: Rect, col?: number, row?: number): Rect;
     trim(): Array<Model>;
     append(models: Array<Model> | Model): void;
-    alloc(rect: Rect, before_rect?: Rect, trimmed_rect?: Rect, crossed_models?: Array<Model>): Array<Model>;
+    alloc(rect: Rect, before_rect?: Rect, trimmed_rect?: Rect, crossed_models?: Array<Model>, size_ratio?: number): Array<Model>;
     cover(mask: Rect): Array<Model>;
     calcWrap(models: Array<Model>): Rect;
     calcOffset(flee_rect: Rect, target_rect: Rect): {

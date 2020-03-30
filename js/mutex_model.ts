@@ -126,7 +126,8 @@ class MutexModel {
         rect: Rect,
         before_rect?: Rect,
         trimmed_rect: Rect = this.format({ ...rect }),
-        crossed_models: Array<Model> = this.cover(trimmed_rect)
+        crossed_models: Array<Model> = this.cover(trimmed_rect),
+        size_ratio: number = 1
     ): Array<Model> {
         let changed_models = crossed_models.slice();
         if (crossed_models.length === 0) {
@@ -139,8 +140,8 @@ class MutexModel {
             trimmed_rect.row === crossed_rect.row &&
             before_rect.colspan === crossed_rect.colspan &&
             before_rect.rowspan === crossed_rect.rowspan &&
-            (Math.abs(rect.col - crossed_rect.col) / before_rect.colspan +
-                Math.abs(rect.row - crossed_rect.row)) / before_rect.rowspan < 0.1 &&
+            (Math.abs(rect.col - crossed_rect.col) +
+                Math.abs(rect.row - crossed_rect.row)) < 0.1 / size_ratio &&
             Math.abs(before_rect.col - crossed_rect.col) / before_rect.colspan +
             Math.abs(before_rect.row - crossed_rect.row) / before_rect.rowspan > 1 &&
             this.cover(before_rect).length === 0

@@ -1,6 +1,6 @@
 {
   "name": "mutex-box",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "main": "./dist/js/mutex_box.js",
   "private": false,
   "license": "MIT",

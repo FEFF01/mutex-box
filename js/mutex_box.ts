@@ -46,8 +46,8 @@ class MutexBox extends MutexModel {
     trim(): any {
         this._update(super.trim() as Array<Box>);
     }
-    alloc(rect: Rect, before_rect?: Rect, trimmed_rect?: Rect, crossed_models?: Array<Model>): any {
-        this._update(super.alloc(rect, before_rect, trimmed_rect, crossed_models) as Array<Box>);
+    alloc(rect: Rect, before_rect?: Rect, trimmed_rect?: Rect, crossed_models?: Array<Model>, size_ratio?: number): any {
+        this._update(super.alloc(rect, before_rect, trimmed_rect, crossed_models, size_ratio) as Array<Box>);
     }
     remove(boxes: Array<Box> | Box) {
         super.remove(boxes);
@@ -234,7 +234,8 @@ class MutexBox extends MutexModel {
     ) => {
         this._stay_timeout = undefined;
         let cell_size = this.cellSize;
-        let col = box.left / cell_size, row = box.top / cell_size;
+        let space = box.space || this.space;
+        let col = (box.left - space.left) / cell_size, row = (box.top - space.top) / cell_size;
         let rect = {
             col, row,
             colspan: box.colspan,
@@ -250,7 +251,7 @@ class MutexBox extends MutexModel {
             this.target_box = null;
             return;
         }
-        this.alloc(rect, box as Rect, trimmed_rect, crossed_models);
+        this.alloc(rect, box as Rect, trimmed_rect, crossed_models, Math.sqrt(cell_size / 60));
         this.format(box as Rect, col, row);
         if (is_release === true) {
             box.dragging = false;

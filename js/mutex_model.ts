@@ -42,8 +42,22 @@ class MutexModel {
                 }
             }
             this.options.ncols = ncols;
+            for (const model of model_list) {
+                if (model.colspan > ncols) {
+                    model.colspan = ncols;
+                }
+                if (model.colspan + model.col > ncols) {
+                    model.col = ncols - model.colspan;
+                }
+            }
             let dirty_data = this._fill(model_list, MutexModel.FLAGS.USE_CHECK | MutexModel.FLAGS.FILL_EACHMODEL);
-            this.append(dirty_data);
+
+            for (const model of dirty_data) {
+                this.alloc(model as Rect);
+                this.fill(model);
+            }
+            /*
+            this.append(dirty_data);*/
         }
 
     }

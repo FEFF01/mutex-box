@@ -47,6 +47,7 @@
             color: palegreen;
             white-space: pre-wrap;
         }
+
         .mutex-box .dragging {
             transition-property: transform;
             -webkit-transition-property: -webkit-transform;
@@ -76,8 +77,8 @@
         <li style="position: fixed;bottom:10px;width: 100%;z-index: 10000; text-align: center;font-size: 1rem;">
             <button @click="mutexBox.trim()"> 纵向压缩 </button>
             <button @click="add_models"> 添加一组元素 </button>
-            <button @click="mutexBox.resize(--ncols)"> 减少一列 </button>
-            <button @click="mutexBox.resize(++ncols)"> 增加一列 </button>
+            <button @click="mutexBox.resize(ncols-1)"> 减少一列 </button>
+            <button @click="mutexBox.resize(ncols+1)"> 增加一列 </button>
         </li>
     </ul>
     <script async src="./js/test_vue.js"></script>

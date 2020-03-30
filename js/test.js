@@ -3,7 +3,7 @@ import { get_models, get_option } from './test_data.js';
 
 //const MutexBox =require('../dist/js/mutex_box.js').default;
 //import MutexBox from './mutex_box.ts';
-const MutexBox =require('./mutex_box.ts').default;//'../dist/js/mutex_box.js'
+const MutexBox = require('./mutex_box.ts').default;//'../dist/js/mutex_box.js'
 let vessel = document.createElement("ul");
 vessel.className = "mutex-box";
 document.body.appendChild(vessel);
@@ -15,10 +15,10 @@ bind_element(models);
 
 let mutexBox = new MutexBox(vessel, models, option);
 btn_col_inc.onclick = () => {
-    mutexBox.resize(++option.ncols);
+    mutexBox.resize(option.ncols + 1);
 };
 btn_col_dec.onclick = () => {
-    mutexBox.resize(--option.ncols);
+    mutexBox.resize(option.ncols - 1);
 }
 btn_trim.onclick = () => {
     mutexBox.trim();

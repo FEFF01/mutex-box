@@ -16,7 +16,7 @@
 ```
     npm install mutex-box
 ```
-> * 免安装可直接保存 `https://feff01.github.io/input-listener/dist/js/mutex_box.js` 文件，本地 script 引入后通过 `window.MutexBox` 使用
+> * 免安装可直接保存 `https://feff01.github.io/mutex-box/dist/js/mutex_box.js` 文件，本地 script 引入后通过 `window.MutexBox` 使用
 
 
 ## 应用

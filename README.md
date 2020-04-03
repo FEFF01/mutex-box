@@ -3,9 +3,9 @@
 > * WEB拖放网格控制器，支持原生JS或任意MVC MVVM框架
 > * 支持 上 下 左 右 四个方向排挤元素
 > * 支持动态增删改元素，动态配置网格列数等等
-> * [测试链接](https://feff01.github.io/mutex-box/dist/test.html)
+> * [测试链接-原生JS](https://feff01.github.io/mutex-box/dist/test.html)
 > * [测试链接-VUE](https://feff01.github.io/mutex-box/dist/test_vue.html)
-> * [网址导航编辑器](http://www.holdhot.com/#/editor)
+> * [网址导航编辑器-VUE](http://www.holdhot.com/#/editor)
 
 ![image](https://feff01.github.io/static/img/holdhot_1.gif)
 ![image](https://feff01.github.io/static/img/mutex_box_1.gif)
@@ -22,10 +22,12 @@
 ## 应用
 
 > * 浏览器环境
+[方法文档](https://github.com/FEFF01/mutex-box/blob/master/dist/mutex_box.d.ts)
+[数据文档](https://github.com/FEFF01/mutex-box/blob/master/dist/interfaces.d.ts)
 ```javascript
 
     /**
-     * @description 具体使用方式参考上两个测试链接和对应的 `test.html` `text_vue.html` 页面 
+     * @description 与父容器DOM相关的交互控制器
      */
     import MutexBox from 'mutex-box';
     //const MutexBox = require('mutex-box').default;
@@ -34,11 +36,14 @@
 ```
 
 > * 各种JS环境
+[方法文档](https://github.com/FEFF01/mutex-box/blob/master/dist/mutex_model.d.ts)
+[数据文档](https://github.com/FEFF01/mutex-box/blob/master/dist/interfaces.d.ts)
 ```javascript
     /**
-     * @description 和交互无关的JS内存模型，输入当前状态可获得各种需要输出的交互
+     * @description 和使用场景无关的交互控制器，输入当前状态可获得各种需要输出的交互
      */
     import {MutexModel} from 'mutex-box';
     //const {MutexModel} = require('mutex-box');
     //const {MutexModel} = window.MutexBox;
 ```
+

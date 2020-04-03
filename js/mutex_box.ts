@@ -16,6 +16,12 @@ class MutexBox extends MutexModel {
     static MutexModel = MutexModel;
     private _stay_timeout?: number;
     private _client_width = 0;
+    /**
+     * @description 在指定html容器内实例化控制器
+     * @param vessel 容器元素（在该元素上监听各种交互，通过该元素的 clientWidth 属性确定每个box的大小）
+     * @param boxes box列表
+     * @param options 参考 interfaces.ts -> Options
+     */
     constructor(
         public vessel: HTMLElement,
         boxes: Array<Box>,
@@ -30,6 +36,9 @@ class MutexBox extends MutexModel {
         });
         this.activate();
     }
+    /**
+     * @description 取消容器事件监听
+     */
     disable() {
         this.inputListener.disable();
     }
@@ -39,13 +48,26 @@ class MutexBox extends MutexModel {
     get space() {
         return this.options.space || MutexBox.space;
     }
+    /**
+     * @description 激活容器事件监听
+     */
     activate() {
         this.resize();
         this.inputListener.activate();
     }
+    /**
+     * @description 移除某个或一组box
+     * @param boxes 
+     */
     remove(boxes: Array<Box> | Box) {
         super.remove(boxes);
     }
+    /**
+     * @description 添加一个或一组box，对于单个box如果 
+     * box.col >= 0 && box.col + box.colspan <= this.ncols && box.row >= 0 成立则强制在指定位置填充该box，
+     * 如果不成立则自动寻找在合适的位置填充该box
+     * @param boxes 
+     */
     add(boxes: Array<Box> | Box) {
         boxes instanceof Array || (boxes = [boxes]);
         for (const box of boxes) {
@@ -58,6 +80,12 @@ class MutexBox extends MutexModel {
         }
         this._update(boxes);
     }
+    /**
+     * @description mutex-box不会主动判断容器元素宽度是否发生改变，当容器宽度发生改变需要立即响应时可以主动调用该方法
+     *  当容器内列数发生改变时可以调用该方法传入新的列数，并通知列数改变是为右扩展还是左扩展
+     * @param ncols 如果为列数更改，传入新的列数
+     * @param direction  -1表示左扩展，1表示右扩展（默认为1）
+     */
     resize = (ncols: number = this.options.ncols, direction?: boolean | number) => {
         let client_width = this.clientWidth;
         if (ncols !== this.ncols || this._client_width !== client_width) {
@@ -69,6 +97,11 @@ class MutexBox extends MutexModel {
     get clientWidth() {
         return isFinite(this.options.client_width) ? this.options.client_width : this.vessel.clientWidth;
     }
+    /**
+     * @description 某个box col row colspan rowspan关系到排版的属性发生改变时，可以调用该方法执行更新
+     * @param box 
+     * @param new_values 
+     */
     update(box?: Box, new_values?: Model) {
         if (box) {
             super.clear(box);
@@ -206,6 +239,12 @@ class MutexBox extends MutexModel {
             }
         }
     }
+    /**
+     * @description 当从其他mutexBox实例或其他地方有元素被拖拽到当前mutexBox容器范围之内，而且需要当前容器接收该元素，则可以调用该方法（一般用于dragMove阶段让当前mutexBox过继手势监听状态）
+     * @param e 如果参数e、t同时存在则为过继dragMove状态，否则为立即dragEnd
+     * @param t 如果参数e、t同时存在则为过继dragMove状态，否则为立即dragEnd
+     * @param box 
+     */
     receive(e?: TouchEvent | MouseEvent, t?: Touch | MouseEvent, box?: Box) {
         if (this.target_box) {
             window.clearTimeout(this._stay_timeout);

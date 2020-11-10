@@ -36,8 +36,8 @@
 ```
 
 > * 各种JS环境
-[方法文档](https://github.com/FEFF01/mutex-box/blob/master/dist/mutex_model.d.ts)
-[数据文档](https://github.com/FEFF01/mutex-box/blob/master/dist/interfaces.d.ts)
+[方法文档](https://github.com/FEFF01/mutex-box/blob/master/dist/js/mutex_model.d.ts)
+[数据文档](https://github.com/FEFF01/mutex-box/blob/master/dist/js/interfaces.d.ts)
 ```javascript
     /**
      * @description 和使用场景无关的交互控制器，输入当前状态可获得各种需要输出的交互

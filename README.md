@@ -22,8 +22,8 @@
 ## 应用
 
 > * 浏览器环境
-[方法文档](https://github.com/FEFF01/mutex-box/blob/master/dist/mutex_box.d.ts)
-[数据文档](https://github.com/FEFF01/mutex-box/blob/master/dist/interfaces.d.ts)
+[方法文档](https://github.com/FEFF01/mutex-box/blob/master/dist/js/mutex_box.d.ts)
+[数据文档](https://github.com/FEFF01/mutex-box/blob/master/dist/js/interfaces.d.ts)
 ```javascript
 
     /**
